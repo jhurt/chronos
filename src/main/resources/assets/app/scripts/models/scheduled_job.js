@@ -166,8 +166,11 @@ function(Backbone,
       if (!time) {
         return 'undefined';
       }
-
-      return time.split('T')[1].split('Z')[0];
+      var dateTime = time.split('T');
+      if(dateTime.length == 1) {
+        return 'undefined';
+      }
+      return dateTime[1].split('Z')[0];
     },
 
     parseDuration: function(duration) {
