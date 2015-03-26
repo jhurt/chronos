@@ -1,5 +1,7 @@
 .*sw?
 *.iml
+*.ipr
+*.iws
 *.log
 .idea/*
 target

@@ -1,6 +1,8 @@
 package org.apache.mesos.chronos.scheduler.config
 
 import java.lang.Thread.UncaughtExceptionHandler
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.logging.{Level, Logger}
 
@@ -14,10 +16,9 @@ import org.apache.mesos.chronos.scheduler.state.PersistenceStore
 import com.google.common.util.concurrent.{ListeningScheduledExecutorService, MoreExecutors, ThreadFactoryBuilder}
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import mesosphere.mesos.util.FrameworkIdUtil
-import mesosphere.util.BackToTheFuture
 import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.framework.recipes.leader.LeaderLatch
-import org.apache.mesos.Protos.FrameworkInfo
+import org.apache.mesos.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.Scheduler
 import org.joda.time.Seconds
 
@@ -47,17 +48,15 @@ class MainModule(val config: SchedulerConfiguration) extends AbstractModule {
   @Singleton
   @Provides
   def provideFrameworkInfo(frameworkIdUtil: FrameworkIdUtil): FrameworkInfo = {
-    import mesosphere.util.BackToTheFuture.Implicits.defaultTimeout
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
+    val simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy-HH-mm")
+    val frameworkId = "chronos-" + simpleDateFormat.format(new Date())
     val frameworkInfo = FrameworkInfo.newBuilder()
       .setName(config.mesosFrameworkName())
       .setCheckpoint(config.mesosCheckpoint())
       .setRole(config.mesosRole())
       .setFailoverTimeout(config.failoverTimeoutSeconds())
       .setUser(config.user())
-    frameworkIdUtil.setIdIfExists(frameworkInfo)
+      .setId(FrameworkID.parseFrom(frameworkId.getBytes("UTF-8")))
     frameworkInfo.build()
   }
 
