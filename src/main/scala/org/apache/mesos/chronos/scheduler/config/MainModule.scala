@@ -49,14 +49,14 @@ class MainModule(val config: SchedulerConfiguration) extends AbstractModule {
   @Provides
   def provideFrameworkInfo(frameworkIdUtil: FrameworkIdUtil): FrameworkInfo = {
     val simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy-HH-mm")
-    val frameworkId = "chronos-" + simpleDateFormat.format(new Date())
+    val frameworkId = FrameworkID.newBuilder().setValue("chronos-" + simpleDateFormat.format(new Date())).build()
     val frameworkInfo = FrameworkInfo.newBuilder()
       .setName(config.mesosFrameworkName())
       .setCheckpoint(config.mesosCheckpoint())
       .setRole(config.mesosRole())
       .setFailoverTimeout(config.failoverTimeoutSeconds())
       .setUser(config.user())
-      .setId(FrameworkID.parseFrom(frameworkId.getBytes("UTF-8")))
+      .setId(frameworkId)
     frameworkInfo.build()
   }
 
